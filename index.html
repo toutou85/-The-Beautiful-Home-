@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Beautiful Home - متجر إلكتروني</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 0; }
+    header { background-color: #001f3f; color: gold; padding: 1rem; text-align: center; font-size: 1.8rem; }
+    header img { height: 60px; vertical-align: middle; margin-left: 10px; }
+    .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; padding: 1rem; }
+    .product { background: white; padding: 1rem; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); text-align: center; }
+    .product img { width: 100%; height: auto; border-radius: 10px; }
+    .product button { margin-top: 10px; padding: 0.5rem 1rem; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    .form-popup { display: none; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); background: white; padding: 1rem; box-shadow: 0 0 20px rgba(0,0,0,0.3); border-radius: 10px; z-index: 1000; max-width: 90%; }
+    .form-popup input, .form-popup textarea, .form-popup select { width: 100%; padding: 0.5rem; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
+    .form-popup button { background: #007bff; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; }
+    .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; }
+    .add-product { padding: 1rem; text-align: center; background: #fff; margin: 1rem; border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="شعار Beautiful Home">
+    متجر Beautiful Home
+  </header>
+
+  <section class="add-product">
+    <h3>إضافة منتج جديد</h3>
+    <input type="text" id="newProductName" placeholder="اسم المنتج">
+    <input type="text" id="newProductImage" placeholder="رابط صورة المنتج">
+    <input type="text" id="newProductPrice" placeholder="سعر المنتج">
+    <button onclick="addProduct()">إضافة</button>
+  </section>
+
+  <section class="products" id="productsContainer">
+  </section>
+
+  <div class="overlay" id="overlay" onclick="closeForm()"></div>
+
+  <div class="form-popup" id="orderForm">
+    <h3>نموذج الطلب</h3>
+    <form id="form">
+      <input type="text" id="name" placeholder="الاسم واللقب" required>
+      <input type="tel" id="phone" placeholder="رقم الهاتف" required>
+      <select id="wilaya" onchange="updateDelivery()" required>
+        <option value="">اختر الولاية</option>
+        <option value="الجزائر">الجزائر</option>
+        <option value="وهران">وهران</option>
+        <option value="سطيف">سطيف</option>
+      </select>
+      <input type="text" id="deliveryPrice" placeholder="سعر التوصيل" readonly>
+      <textarea id="location" placeholder="العنوان / الموقع بالتفصيل" required></textarea>
+      <input type="hidden" id="product" name="product">
+      <button type="submit">إرسال الطلب</button>
+      <button type="button" onclick="closeForm()" style="background:#dc3545;margin-top:5px">إلغاء</button>
+    </form>
+  </div>
+
+  <script>
+    const deliveryPrices = {
+      "الجزائر": "500 دج",
+      "وهران": "600 دج",
+      "سطيف": "700 دج"
+    };
+
+    function openForm(productName) {
+      document.getElementById('product').value = productName;
+      document.getElementById('orderForm').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    }
+
+    function closeForm() {
+      document.getElementById('orderForm').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    }
+
+    function updateDelivery() {
+      const wilaya = document.getElementById('wilaya').value;
+      document.getElementById('deliveryPrice').value = deliveryPrices[wilaya] || '';
+    }
+
+    document.getElementById('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('تم إرسال الطلب بنجاح! سيتم الاتصال بك قريبًا.');
+      closeForm();
+      document.getElementById('form').reset();
+    });
+
+    function addProduct() {
+      const name = document.getElementById('newProductName').value;
+      const image = document.getElementById('newProductImage').value;
+      const price = document.getElementById('newProductPrice').value;
+      if (!name || !image || !price) return alert("يرجى ملء كل الحقول");
+
+      const container = document.getElementById('productsContainer');
+      const div = document.createElement('div');
+      div.className = 'product';
+      div.innerHTML = `
+        <img src="${image}" alt="${name}">
+        <h3>${name}</h3>
+        <p>السعر: ${price} دج</p>
+        <button onclick="openForm('${name}')">اطلب الآن</button>
+      `;
+      container.appendChild(div);
+
+      document.getElementById('newProductName').value = '';
+      document.getElementById('newProductImage').value = '';
+      document.getElementById('newProductPrice').value = '';
+    }
+  </script>
+</body>
+</html>
